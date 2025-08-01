@@ -99,22 +99,23 @@ export class UserService {
 				},
 				data: {
 					...dto,
-					...(dto.password ? {password:hashedPassword} : {})
+					...(dto.password ? { password: hashedPassword } : {})
 				},
 				select: this.selectUserData
 			})
 		} catch (error) {
-			if(error instanceof Prisma.PrismaClientKnownRequestError){
-
-				if(error.code === 'P2002'){
-					throw new ConflictException("Користувач з таким email вже існує.");
+			if (error instanceof Prisma.PrismaClientKnownRequestError) {
+				if (error.code === 'P2002') {
+					throw new ConflictException(
+						'Користувач з таким email вже існує.'
+					)
 				}
 
-				if(error.code ==='P2016' || error.code === 'P2009'){
-					throw new BadRequestException("Під час оновлення користувача виникла помилка.");
-					
+				if (error.code === 'P2016' || error.code === 'P2009') {
+					throw new BadRequestException(
+						'Під час оновлення користувача виникла помилка.'
+					)
 				}
-
 			}
 
 			throw error
@@ -124,9 +125,11 @@ export class UserService {
 	async delete(id: string) {
 		try {
 			const user = await this.findById(id)
-			return await this.prismaService.user.delete({
+			 await this.prismaService.user.delete({
 				where: { id: user.id }
 			})
+
+			return {message:'Користувача видалено.'}
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				if (error.code === 'P2025') {
